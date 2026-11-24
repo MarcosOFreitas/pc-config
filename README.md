@@ -1,8 +1,18 @@
 # PC-Config
 
-Scripts para configurar uma máquina Windows 11 do zero: apps, shell, VS Code e debloat.
+Scripts para configurar uma máquina Windows 11 do zero: apps, shell, VS Code, git, WSL e debloat.
 
-## Uso
+## Máquina nova
+
+Abra o PowerShell **como administrador** e rode:
+
+```powershell
+irm https://raw.githubusercontent.com/MarcosOFreitas/pc-config/main/bootstrap.ps1 | iex
+```
+
+Baixa o repo para `~\pc-config`, roda todos os scripts na ordem e deixa a pasta como clone git (atualize com `git pull`). Reinicie no fim.
+
+## Scripts avulsos
 
 Abra o PowerShell **como administrador** na pasta do repo:
 
@@ -11,14 +21,19 @@ Set-ExecutionPolicy Bypass -Scope Process -Force
 .\debloat.ps1   # remove bloat, telemetria, ajustes de desempenho (reinicie depois)
 .\shell.ps1     # PowerShell 7, ferramentas de terminal, perfil, fonte, Windows Terminal
 .\install.ps1   # demais apps de apps.json
+.\wsl.ps1       # WSL + Ubuntu + .wslconfig
 .\vscode.ps1    # extensões e configs do VS Code
+.\git.ps1       # git config, chave SSH, login no GitHub
 ```
 
 Cada script roda sozinho e pode ser repetido: o que já está instalado é pulado.
 
 | Script | O que faz | Opções |
 |---|---|---|
-| `install.ps1` | Instala os apps de `apps.json`: `uv` > `winget` > `choco` (fallback) | `-Categoria Dev,Terminal` |
+| `bootstrap.ps1` | Baixa o repo e roda todos os scripts abaixo | — |
+| `install.ps1` | Instala os apps de `apps.json`: `uv` > `winget` > `choco` (fallback) | `-Categoria Dev,Terminal`, `-Exportar` (lista apps instalados fora do `apps.json`) |
+| `git.ps1` | Nome/email (perguntados na hora), config global, chave SSH ed25519, `gh auth login` e envio da chave pública | — |
+| `wsl.ps1` | WSL + Ubuntu, `.wslconfig` com metade da RAM e das CPUs | `-Distro` |
 | `shell.ps1` | Categoria `Terminal` + `$PROFILE` apontando para `profile.ps1` + Meslo Nerd Font + Windows Terminal padrão | `-SoPerfil` |
 | `profile.ps1` | Perfil do pwsh: tema Oh My Posh `amro`, autocomplete, zoxide, aliases | — |
 | `debloat.ps1` | Ponto de restauração, remove apps, telemetria, anúncios, ajustes de Explorer e desempenho | — |
@@ -44,6 +59,10 @@ Edite `apps.json`, na categoria certa:
 | `lg` / `g` / `gs` | `lazygit` / `git` / `git status -sb` |
 | `..` / `...` | sobe 1 / 2 pastas |
 | `which`, `touch` | equivalentes do Unix |
+
+## Dados pessoais
+
+O repo é público. Nome, email, chaves SSH e tokens **não** ficam aqui: o `git.ps1` pergunta na hora e grava só no `~/.gitconfig` e em `~/.ssh`. O `.gitignore` bloqueia chaves, `.env` e `mcp.json`.
 
 ## Specs
 
