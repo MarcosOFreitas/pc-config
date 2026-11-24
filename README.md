@@ -56,7 +56,7 @@ Cada script roda sozinho e pode ser repetido: o que já está instalado é pulad
 | `install.ps1` | Instala os apps de `apps.json`: `uv` > `winget` > `choco` (fallback) | `-Categoria Dev,Terminal`, `-Exportar` (lista apps instalados fora do `apps.json`) |
 | `windows.ps1` | Preferências do Windows: tema escuro; barra centralizada, sem busca nem Visão de Tarefas (a ocultação automática é do mod `mac-island-dock`); Iniciar sem recomendados; fuso de Brasília, hora automática, pt-BR ABNT2; caminhos longos, modo desenvolvedor, Storage Sense; sem suspender na tomada | — |
 | `windhawk.ps1` | Restaura configurações de `windhawk/mods.json` nos mods já instalados e lista os que faltam instalar (o Windhawk não tem comando de instalação) | `-Exportar` (salva as da máquina), `-WhatIf` |
-| `sandbox.ps1` | Testa o bootstrap num Windows Sandbox limpo, sem intervenção, e mostra o log | `-Passos`, `-TimeoutMin` |
+| `sandbox.ps1` | Testa o bootstrap num Windows Sandbox limpo, sem intervenção, e mostra o log | `-Passos`, `-TimeoutMin`, `-Categoria` e `-InstalarAntes` (rodada curta, sem o bootstrap) |
 | `tests.ps1` | Checagens estáticas dos scripts (rode antes de commitar) | — |
 | `git.ps1` | Nome/email (perguntados na hora), config global, chave SSH ed25519, `gh auth login` e envio da chave pública | — |
 | `wsl.ps1` | WSL + Ubuntu, `.wslconfig` com metade da RAM e das CPUs | `-Distro` |
