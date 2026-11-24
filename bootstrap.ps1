@@ -31,7 +31,7 @@ $steps = 'debloat', 'shell', 'install', 'wsl', 'vscode', 'git' | Where-Object { 
 if (-not $steps) { Write-Host 'x Nenhum passo selecionado.' -ForegroundColor Red; return }
 Write-Host "Passos: $($steps -join ' > ')" -ForegroundColor Cyan
 
-$admin = ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole('Administrators')
+$admin = ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)  # language independent
 if (-not $admin) { Write-Host 'x Abra o PowerShell como administrador e rode de novo.' -ForegroundColor Red; return }
 
 Set-ExecutionPolicy Bypass -Scope Process -Force

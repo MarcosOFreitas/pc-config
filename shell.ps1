@@ -11,7 +11,10 @@ param([switch]$SoPerfil)
 $ErrorActionPreference = 'Stop'
 $root = $PSScriptRoot
 
-if (-not $SoPerfil) { & "$root\install.ps1" -Categoria Terminal }
+if (-not $SoPerfil) {
+    & "$root\install.ps1" -Categoria Terminal
+    if ($LASTEXITCODE) { Write-Host 'x Falha ao instalar ferramentas do terminal; perfil nao configurado.' -ForegroundColor Red; exit 1 }
+}
 
 Write-Host '==> Perfil do PowerShell 7' -ForegroundColor Cyan
 $target = Join-Path ([Environment]::GetFolderPath('MyDocuments')) 'PowerShell\Microsoft.PowerShell_profile.ps1'

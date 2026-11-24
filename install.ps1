@@ -24,7 +24,7 @@ if ($Exportar) {
     exit
 }
 
-$admin = ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole('Administrators')
+$admin = ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)  # language independent
 if (-not $admin) { Write-Host 'x Rode como administrador.' -ForegroundColor Red; exit 1 }
 
 function Update-SessionPath {
