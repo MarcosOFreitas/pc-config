@@ -10,6 +10,7 @@ Preferências do Windows, separadas do `debloat.ps1` (que só remove).
 - Iniciar: sem recomendados nem itens recentes (`HideRecommendedSection` só vale em Education/Enterprise).
 - Região: fuso `E. South America Standard Time`, serviço `w32time` automático e `w32tm /resync`, idioma pt-BR (só troca a lista se o primeiro não for pt-BR; inclui ABNT2), cultura pt-BR, local Brasil.
 - Arquivos: caminhos longos, modo desenvolvedor, Storage Sense (temporários, lixeira com 30 dias, só com pouco disco).
+- Python só pelo uv (variáveis de ambiente do usuário): `PIP_REQUIRE_VIRTUALENV=1` (o pip recusa instalar fora de um venv, mesmo com `--break-system-packages`) e `UV_PYTHON_PREFERENCE=only-managed` (o uv nunca usa um Python do sistema). Não impede o pip dentro de um venv criado com `python -m venv`; `uv venv` não traz pip. Valem só em terminais abertos depois.
 - Energia (na tomada): nunca suspende nem hiberna, tela desliga em 15 min.
 - Reinicia o Explorer no fim; idioma e teclado valem após reiniciar.
 

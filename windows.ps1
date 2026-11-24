@@ -2,7 +2,7 @@
 <#
 .SYNOPSIS
   Windows preferences: dark mode, taskbar, Start menu, region, files, power.
-  debloat.ps1 removes things; this one only sets preferences.
+  debloat.ps1 removes things; this one only sets preferences (and the uv-only Python variables).
   Values Windows locks (UCPD) only warn. Run again after changing your mind: it is idempotent.
 #>
 . "$PSScriptRoot\lib.ps1"
@@ -48,6 +48,16 @@ Set-Reg $ss '04' 1      # temp files
 Set-Reg $ss '08' 1      # recycle bin
 Set-Reg $ss '256' 30    # recycle bin: items older than 30 days
 Set-Reg $ss '2048' 0    # run only when disk is low
+
+Write-Host '==> Python: pacotes so pelo uv' -ForegroundColor Cyan
+# pip refuses to install outside a venv (even with --break-system-packages); uv never picks a system Python.
+$locks = [ordered]@{ PIP_REQUIRE_VIRTUALENV = '1'; UV_PYTHON_PREFERENCE = 'only-managed' }
+foreach ($name in $locks.Keys) {
+    if ([Environment]::GetEnvironmentVariable($name, 'User') -ne $locks[$name]) {
+        [Environment]::SetEnvironmentVariable($name, $locks[$name], 'User')
+        Write-Host "  + $name=$($locks[$name])" -ForegroundColor Green
+    } else { Write-Host "  = $name" -ForegroundColor DarkGray }
+}
 
 Write-Host '==> Energia' -ForegroundColor Cyan
 powercfg /change standby-timeout-ac 0      # never sleep on AC

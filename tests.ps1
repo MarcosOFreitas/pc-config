@@ -39,6 +39,12 @@ foreach ($n in 'install', 'vscode', 'git', 'wsl') {
 $leaky = Select-String -Path "$PSScriptRoot\install.ps1" -Pattern '(winget @|choco install|uv python install|uv tool install)' | Where-Object { $_.Line -notmatch 'Out-Host' -and $_.Line.TrimStart() -notmatch '^#' }
 Assert (-not $leaky) 'install.ps1 sends native installer output to Out-Host'
 
+# Python packages only through uv: pip refuses to install outside a venv (even with
+# --break-system-packages) and uv never picks a system Python.
+foreach ($v in 'PIP_REQUIRE_VIRTUALENV', 'UV_PYTHON_PREFERENCE') {
+    Assert (Select-String -Path "$PSScriptRoot\windows.ps1" -Pattern $v -Quiet) "windows.ps1 sets $v"
+}
+
 # Public repo: no machine-specific user paths in any script (tests.ps1 itself excluded).
 foreach ($f in $scripts | Where-Object Name -ne 'tests.ps1') {
     Assert (-not (Select-String -Path $f.FullName -Pattern 'C:\\Users\\[A-Za-z]' -Quiet)) "$($f.Name) has no hardcoded user path"
