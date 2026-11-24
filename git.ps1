@@ -4,7 +4,8 @@
   Name and email are asked at run time and saved only in ~/.gitconfig.
   The private key never leaves ~/.ssh; only the public key is sent to GitHub.
 #>
-$ErrorActionPreference = 'Stop'
+# Not 'Stop': git, gh and `ssh -T` write normal messages to stderr, which 5.1 would treat as fatal.
+$ErrorActionPreference = 'Continue'
 
 foreach ($tool in 'git', 'gh', 'ssh-keygen') {
     if (-not (Get-Command $tool -ErrorAction SilentlyContinue)) {

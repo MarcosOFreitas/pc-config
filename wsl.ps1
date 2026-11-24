@@ -5,7 +5,8 @@
   Reboot may be needed on the first install.
 #>
 param([string]$Distro = 'Ubuntu')
-$ErrorActionPreference = 'Stop'
+# Not 'Stop': wsl.exe writes status text to stderr, which 5.1 would treat as fatal.
+$ErrorActionPreference = 'Continue'
 
 Write-Host '==> WSL' -ForegroundColor Cyan
 wsl --update

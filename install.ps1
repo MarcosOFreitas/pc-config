@@ -8,7 +8,9 @@
   .\install.ps1 -Exportar                # list installed winget apps missing from apps.json
 #>
 param([string[]]$Categoria, [switch]$Exportar)
-$ErrorActionPreference = 'Stop'
+# Not 'Stop': in Windows PowerShell 5.1 any stderr text from uv/winget/choco would abort the script.
+# Native results are checked through $LASTEXITCODE instead.
+$ErrorActionPreference = 'Continue'
 
 if ($Exportar) {
     $known = (Get-Content "$PSScriptRoot\apps.json" -Raw | ConvertFrom-Json).PSObject.Properties.Value.winget
@@ -38,6 +40,7 @@ function Install-Choco {
     [Net.ServicePointManager]::SecurityProtocol = [Net.ServicePointManager]::SecurityProtocol -bor 3072
     Invoke-Expression ((New-Object Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
     Update-SessionPath
+    if (-not (Get-Command choco -ErrorAction SilentlyContinue)) { throw 'Chocolatey nao instalou' }
 }
 
 # winget can be missing (Windows Sandbox, LTSC, old builds): then everything goes through choco.
@@ -52,7 +55,8 @@ function Install-App($app) {
         if (-not (Get-Command uv -ErrorAction SilentlyContinue)) { Write-Host "  x $name (uv ausente)" -ForegroundColor Red; return $false }
         # "python" = interpreter; anything else = CLI tool in an isolated env.
         # TODO: drop --preview once `uv python install --default` is stable.
-        if ($app.uv -eq 'python') { uv python install --default --preview } else { uv tool install $app.uv }
+        # Out-Host: native output must not leak into this function's return value.
+        if ($app.uv -eq 'python') { uv python install --default --preview | Out-Host } else { uv tool install $app.uv | Out-Host }
         if ($LASTEXITCODE -eq 0) { Write-Host "  + $name (uv)" -ForegroundColor Green; return $true }
     }
     if ($app.winget -and $hasWinget) {
@@ -61,26 +65,28 @@ function Install-App($app) {
         $source = if ($app.winget -match '^9[A-Z0-9]{11}$') { 'msstore' } else { 'winget' }
         winget list --id $app.winget --exact --source $source --accept-source-agreements *> $null
         if ($LASTEXITCODE -eq 0) { Write-Host "  = $name (ja instalado)" -ForegroundColor DarkGray; return $true }
-        winget install --id $app.winget --exact --source $source --silent `
-            --accept-package-agreements --accept-source-agreements --disable-interactivity
+        $wingetArgs = @('install', '--id', $app.winget, '--exact', '--source', $source, '--silent',
+            '--accept-package-agreements', '--accept-source-agreements', '--disable-interactivity')
+        winget @wingetArgs | Out-Host
         if ($LASTEXITCODE -eq 0) { Write-Host "  + $name (winget)" -ForegroundColor Green; return $true }
     }
     if ($app.choco) {
         Install-Choco
-        choco install $app.choco -y --no-progress
+        choco install $app.choco -y --no-progress | Out-Host
         if ($LASTEXITCODE -in 0, 1641, 3010) { Write-Host "  + $name (choco)" -ForegroundColor Green; return $true }
     }
     Write-Host "  x $name falhou" -ForegroundColor Red
     return $false
 }
 
-$apps = Get-Content "$PSScriptRoot\apps.json" -Raw | ConvertFrom-Json
+$apps = Get-Content "$PSScriptRoot\apps.json" -Raw -ErrorAction Stop | ConvertFrom-Json
 $failed = @()
 foreach ($cat in $apps.PSObject.Properties) {
     if ($Categoria -and $cat.Name -notin $Categoria) { continue }
     Write-Host "==> $($cat.Name)" -ForegroundColor Cyan
     foreach ($app in $cat.Value) {
-        if (-not (Install-App $app)) { $failed += @($app.nome, $app.uv, $app.winget, $app.choco) -ne $null | Select-Object -First 1 }
+        $ok = try { Install-App $app } catch { Write-Host "  x $_" -ForegroundColor Red; $false }
+        if (-not $ok) { $failed += @($app.nome, $app.uv, $app.winget, $app.choco) -ne $null | Select-Object -First 1 }
     }
 }
 Update-SessionPath

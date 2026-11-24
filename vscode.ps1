@@ -7,7 +7,8 @@
   .\vscode.ps1 -Exportar  # save current machine's extensions/settings back into the repo
 #>
 param([switch]$Exportar)
-$ErrorActionPreference = 'Stop'
+# Not 'Stop': `code` prints Node warnings to stderr, which 5.1 would turn into a fatal error.
+$ErrorActionPreference = 'Continue'
 $repo = "$PSScriptRoot\vscode"
 $user = "$env:APPDATA\Code\User"
 

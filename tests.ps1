@@ -26,6 +26,19 @@ foreach ($f in $scripts | Where-Object Name -ne 'tests.ps1') {
 # a permanent registry auto-hide would fight it.
 Assert (-not (Select-String -Path "$PSScriptRoot\windows.ps1" -Pattern 'StuckRects3' -Quiet)) 'windows.ps1 leaves taskbar auto-hide to the Windhawk mod'
 
+# Windows PowerShell 5.1 turns stderr text of a native command into a terminating error when
+# stderr is redirected (`2>&1`, `*>`, logging) and $ErrorActionPreference is 'Stop' (uv prints
+# download progress, `code` prints Node warnings): that aborted install.ps1 and vscode.ps1 in the
+# Sandbox run. These scripts mostly run native tools and check $LASTEXITCODE instead.
+foreach ($n in 'install', 'vscode', 'git', 'wsl') {
+    Assert (-not (Select-String -Path "$PSScriptRoot\$n.ps1" -Pattern "ErrorActionPreference\s*=\s*'Stop'" -Quiet)) "$n.ps1 does not use ErrorActionPreference Stop with native commands"
+}
+
+# Native output inside Install-App must go to the host: left in the pipeline it pollutes the
+# function's return value (so a failure may not be counted) and never reaches the log.
+$leaky = Select-String -Path "$PSScriptRoot\install.ps1" -Pattern '(winget @|choco install|uv python install|uv tool install)' | Where-Object { $_.Line -notmatch 'Out-Host' -and $_.Line.TrimStart() -notmatch '^#' }
+Assert (-not $leaky) 'install.ps1 sends native installer output to Out-Host'
+
 # Public repo: no machine-specific user paths in any script (tests.ps1 itself excluded).
 foreach ($f in $scripts | Where-Object Name -ne 'tests.ps1') {
     Assert (-not (Select-String -Path $f.FullName -Pattern 'C:\\Users\\[A-Za-z]' -Quiet)) "$($f.Name) has no hardcoded user path"
