@@ -12,6 +12,26 @@ irm https://raw.githubusercontent.com/MarcosOFreitas/pc-config/main/bootstrap.ps
 
 Baixa o repo para `~\pc-config`, roda todos os scripts na ordem e deixa a pasta como clone git (atualize com `git pull`). Reinicie no fim.
 
+### Escolher passos
+
+`irm | iex` não aceita parâmetros; para passá-los use `[scriptblock]::Create`:
+
+```powershell
+# tudo menos o debloat
+& ([scriptblock]::Create((irm https://raw.githubusercontent.com/MarcosOFreitas/pc-config/main/bootstrap.ps1))) -Pular debloat
+
+# PC já configurado: só apps e VS Code, usando o clone que já existe
+& ([scriptblock]::Create((irm https://raw.githubusercontent.com/MarcosOFreitas/pc-config/main/bootstrap.ps1))) -Passos install,vscode -Destino $HOME\dev\pc-config
+```
+
+| Parâmetro | Valores | Padrão |
+|---|---|---|
+| `-Passos` | `debloat`, `shell`, `install`, `wsl`, `vscode`, `git` (ordem fixa) | todos |
+| `-Pular` | mesmos valores | nenhum |
+| `-Destino` | pasta do repo | `~\pc-config` |
+
+Num PC já configurado, rode `.\vscode.ps1 -Exportar` antes: o passo `vscode` sobrescreve `settings.json`.
+
 ## Scripts avulsos
 
 Abra o PowerShell **como administrador** na pasta do repo:

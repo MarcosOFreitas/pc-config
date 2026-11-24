@@ -4,10 +4,32 @@
     irm https://raw.githubusercontent.com/MarcosOFreitas/pc-config/main/bootstrap.ps1 | iex
   Downloads the repo to ~\pc-config, runs every setup script in order,
   then turns the folder into a git clone so it can be updated with `git pull`.
+
+  With parameters (irm | iex cannot pass them):
+    & ([scriptblock]::Create((irm <url>))) -Pular debloat
+    & ([scriptblock]::Create((irm <url>))) -Passos install,vscode -Destino $HOME\dev\pc-config
+  Or locally: .\bootstrap.ps1 -Passos install,git
+.PARAMETER Passos
+  Steps to run, in the fixed order below. Default: all.
+.PARAMETER Pular
+  Steps to skip.
+.PARAMETER Destino
+  Repo folder. Use the existing clone on an already configured PC to avoid a second copy.
 #>
+param(
+    [ValidateSet('debloat', 'shell', 'install', 'wsl', 'vscode', 'git')]
+    [string[]]$Passos = @('debloat', 'shell', 'install', 'wsl', 'vscode', 'git'),
+    [ValidateSet('debloat', 'shell', 'install', 'wsl', 'vscode', 'git')]
+    [string[]]$Pular = @(),
+    [string]$Destino = "$HOME\pc-config"   # durable: $PROFILE dot-sources profile.ps1 from here
+)
 $ErrorActionPreference = 'Stop'
 $repo = 'MarcosOFreitas/pc-config'
-$dest = "$HOME\pc-config"   # durable: $PROFILE dot-sources profile.ps1 from here
+$dest = $Destino
+# Fixed order; -Passos only filters it.
+$steps = 'debloat', 'shell', 'install', 'wsl', 'vscode', 'git' | Where-Object { $_ -in $Passos -and $_ -notin $Pular }
+if (-not $steps) { Write-Host 'x Nenhum passo selecionado.' -ForegroundColor Red; return }
+Write-Host "Passos: $($steps -join ' > ')" -ForegroundColor Cyan
 
 $admin = ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole('Administrators')
 if (-not $admin) { Write-Host 'x Abra o PowerShell como administrador e rode de novo.' -ForegroundColor Red; return }
@@ -32,7 +54,7 @@ if (Test-Path "$dest\.git") {
 
 # Each step is independent; a failure is reported and the next one still runs.
 $failed = @()
-foreach ($step in 'debloat', 'shell', 'install', 'wsl', 'vscode', 'git') {
+foreach ($step in $steps) {
     Write-Host "`n########## $step.ps1 ##########" -ForegroundColor Magenta
     try {
         & "$dest\$step.ps1"
