@@ -87,3 +87,4 @@ Set-Reg 'HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemPro
 
 Stop-Process -Name explorer -Force
 Write-Host "`nPronto. Reinicie o PC." -ForegroundColor Green
+exit 0

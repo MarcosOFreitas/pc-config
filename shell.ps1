@@ -52,3 +52,4 @@ Set-ItemProperty $console DelegationConsole '{2EACA947-7F5F-4CFA-BA87-8F7FBEEFBE
 Set-ItemProperty $console DelegationTerminal '{E12CFF52-A866-4C77-9A90-F570A7AA2C6B}'
 
 Write-Host "`nPronto. Abra um novo pwsh." -ForegroundColor Green
+exit 0

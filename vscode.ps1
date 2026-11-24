@@ -44,3 +44,4 @@ foreach ($file in 'settings.json', 'keybindings.json') {
 
 if ($failed) { Write-Host "`nFalharam: $($failed -join ', ')" -ForegroundColor Red; exit 1 }
 Write-Host "`nPronto. Reabra o VS Code." -ForegroundColor Green
+exit 0
