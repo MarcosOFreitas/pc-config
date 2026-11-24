@@ -12,8 +12,12 @@ Windows 11 machine setup in PowerShell. See README.md for usage and `.specs/` fo
 - Scripts end with `exit 0` on success and `exit 1` on failure: `bootstrap.ps1` reads `$LASTEXITCODE`.
 - Mark known gaps with `# TODO:` comments; keep `.specs/` in sync when behavior changes.
 
+- Admin check: `IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)`, never the group name (it is localized: `Administradores` on pt-BR).
+- Registry writes in `debloat.ps1` go through `Set-Reg`, which warns instead of failing on values Windows locks (UCPD).
+
 ## Check before commit
 ```powershell
-foreach ($f in Get-ChildItem *.ps1) { $e = $null; [void][Management.Automation.Language.Parser]::ParseFile($f.FullName, [ref]$null, [ref]$e); "$($f.Name): $($e.Count) errors" }
+powershell -NoProfile -File .\tests.ps1
+pwsh -NoProfile -File .\tests.ps1
 ```
-Run it in both `powershell` and `pwsh`.
+Each fixed bug gets an assertion in `tests.ps1` that fails on the old code.
