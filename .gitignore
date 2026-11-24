@@ -1,1 +1,9 @@
 *.bak
+
+# Public repo: never commit keys, tokens or personal config.
+id_*
+*.pem
+*.key
+.env*
+mcp.json
+.wslconfig
