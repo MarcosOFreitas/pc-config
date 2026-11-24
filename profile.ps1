@@ -1,9 +1,9 @@
 # PowerShell 7 profile. Loaded from $PROFILE by install.ps1 (dot-source).
 
 # Theme
-# TODO: pin the theme locally (themes/amro.omp.json) so a new machine works offline.
+# Local copy of the upstream amro theme, so the prompt works offline.
 if (Get-Command oh-my-posh -ErrorAction SilentlyContinue) {
-    oh-my-posh init pwsh --config 'https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/amro.omp.json' | Invoke-Expression
+    oh-my-posh init pwsh --config "$PSScriptRoot\themes\amro.omp.json" | Invoke-Expression
 }
 
 # Autocomplete

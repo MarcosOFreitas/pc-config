@@ -11,7 +11,7 @@ Deixar o PowerShell 7 como shell do dia a dia, com tema, autocomplete e aliases.
 - Windows Terminal vira o terminal padrão do Windows (`HKCU:\Console\%%Startup`).
 
 ## Requisitos: profile.ps1
-- Tema Oh My Posh `amro`.
+- Tema Oh My Posh `amro`, cópia local em `themes/amro.omp.json` (funciona offline).
 - PSReadLine: sugestões do histórico em lista, Tab = menu, setas buscam no histórico. Falha de predição em saída redirecionada é ignorada.
 - Completions: `winget`, `gh`, `uv`. `zoxide` (`z`).
 - Aliases do README. Cada um só é criado se a ferramenta existir.
@@ -20,5 +20,4 @@ Deixar o PowerShell 7 como shell do dia a dia, com tema, autocomplete e aliases.
 - O PowerShell 5.1 não é removido: faz parte do Windows e o sistema depende dele.
 
 ## TODO
-- Tema baixado da internet a cada init; guardar uma cópia no repo.
 - Reescrever o `settings.json` do Windows Terminal perde comentários.
