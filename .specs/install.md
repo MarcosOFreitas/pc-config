@@ -12,6 +12,7 @@ Instalar os apps de `apps.json` numa máquina nova, sem interação.
 - Chocolatey é instalado sozinho só quando a primeira entrada precisa dele.
 - `-Categoria` limita às categorias pedidas.
 - No fim, lista o que falhou e sai com código 1.
+- `-Exportar` (sem admin): compara `winget export` com `apps.json` e lista o que está instalado e fora da lista, ignorando runtimes.
 
 ## Fora do escopo
 - Games, runtimes (VCRedist, .NET, WindowsAppRuntime) e dependências que os apps puxam sozinhos.

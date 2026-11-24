@@ -1,14 +1,31 @@
-#Requires -RunAsAdministrator
 <#
 .SYNOPSIS
   Installs apps from apps.json.
   Order per entry: "uv" (Python tools/interpreter) > "winget" > "choco" (fallback).
 .EXAMPLE
-  .\install.ps1                          # all categories
-  .\install.ps1 -Categoria Dev,Terminal  # selected categories
+  .\install.ps1                          # all categories (admin)
+  .\install.ps1 -Categoria Dev,Terminal  # selected categories (admin)
+  .\install.ps1 -Exportar                # list installed winget apps missing from apps.json
 #>
-param([string[]]$Categoria)
+param([string[]]$Categoria, [switch]$Exportar)
 $ErrorActionPreference = 'Stop'
+
+if ($Exportar) {
+    $known = (Get-Content "$PSScriptRoot\apps.json" -Raw | ConvertFrom-Json).PSObject.Properties.Value.winget
+    $tmp = Join-Path $env:TEMP 'winget-export.json'
+    winget export -o $tmp --accept-source-agreements *> $null
+    # Runtimes and frameworks come in as dependencies; not worth listing.
+    $noise = '^(Microsoft\.(VCRedist|VCLibs|UI\.Xaml|WindowsAppRuntime|DotNet|AppInstaller|GameInput|WindowsSDK))'
+    $missing = (Get-Content $tmp -Raw | ConvertFrom-Json).Sources.Packages.PackageIdentifier |
+        Where-Object { $_ -notin $known -and $_ -notmatch $noise } | Sort-Object
+    Remove-Item $tmp
+    if ($missing) { Write-Host 'Instalados e fora do apps.json:' -ForegroundColor Yellow; $missing | ForEach-Object { "  $_" } }
+    else { Write-Host 'apps.json cobre tudo que esta instalado.' -ForegroundColor Green }
+    exit
+}
+
+$admin = ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole('Administrators')
+if (-not $admin) { Write-Host 'x Rode como administrador.' -ForegroundColor Red; exit 1 }
 
 function Update-SessionPath {
     $env:Path = [Environment]::GetEnvironmentVariable('Path', 'Machine') + ';' + [Environment]::GetEnvironmentVariable('Path', 'User')
@@ -66,3 +83,4 @@ Update-SessionPath
 
 if ($failed) { Write-Host "`nFalharam: $($failed -join ', ')" -ForegroundColor Red; exit 1 }
 Write-Host "`nApps instalados." -ForegroundColor Green
+exit 0
