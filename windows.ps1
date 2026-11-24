@@ -17,11 +17,8 @@ Write-Host '==> Barra de tarefas' -ForegroundColor Cyan
 Set-Reg "$cv\Explorer\Advanced" TaskbarAl 1                 # icons centered
 Set-Reg "$cv\Search" SearchboxTaskbarMode 0                 # no search box
 Set-Reg "$cv\Explorer\Advanced" ShowTaskViewButton 0
-# Auto-hide lives in byte 8 of a binary blob: 3 = hide, 2 = always visible.
-$stuck = "$cv\Explorer\StuckRects3"
-$blob = (Get-ItemProperty $stuck -ErrorAction SilentlyContinue).Settings
-if ($blob) { $blob[8] = 3; Set-Reg $stuck Settings $blob 'Binary' }
-else { Write-Warning 'StuckRects3 ausente (faca login uma vez); barra nao foi ocultada.' }
+# Auto-hide is left to the Windhawk mod mac-island-dock (hiding.hideWhen = mouseAway): it turns
+# Windows' auto-hide on and off by itself, and a permanent registry value would fight it.
 
 Write-Host '==> Menu Iniciar' -ForegroundColor Cyan
 Set-Reg "$cv\Explorer\Advanced" Start_TrackDocs 0

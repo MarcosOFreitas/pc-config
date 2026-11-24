@@ -22,6 +22,10 @@ foreach ($f in $scripts | Where-Object Name -ne 'tests.ps1') {
     Assert (-not (Select-String -Path $f.FullName -Pattern "IsInRole\('" -Quiet)) "$($f.Name) admin check is language independent"
 }
 
+# The mac-island-dock Windhawk mod switches Windows' taskbar auto-hide on and off itself;
+# a permanent registry auto-hide would fight it.
+Assert (-not (Select-String -Path "$PSScriptRoot\windows.ps1" -Pattern 'StuckRects3' -Quiet)) 'windows.ps1 leaves taskbar auto-hide to the Windhawk mod'
+
 # Public repo: no machine-specific user paths in any script (tests.ps1 itself excluded).
 foreach ($f in $scripts | Where-Object Name -ne 'tests.ps1') {
     Assert (-not (Select-String -Path $f.FullName -Pattern 'C:\\Users\\[A-Za-z]' -Quiet)) "$($f.Name) has no hardcoded user path"
