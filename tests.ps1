@@ -66,6 +66,31 @@ $read = if (Get-Command Get-RegValue -ErrorAction SilentlyContinue) { Get-RegVal
 Remove-Item $tmp -Recurse -ErrorAction SilentlyContinue
 Assert ($read -eq -100) 'Get-RegValue reads a negative DWord as -100'
 
+# windhawk.ps1 restore: apply mods.json onto empty scratch keys (HKCU, no admin) and compare
+# every setting's type and value, then run again to prove it is idempotent.
+$scratch = 'HKCU:\Software\PcConfigTests\Windhawk'
+Remove-Item $scratch -Recurse -ErrorAction SilentlyContinue
+$mods = Get-Content "$PSScriptRoot\windhawk\mods.json" -Raw | ConvertFrom-Json
+foreach ($m in $mods.PSObject.Properties) {
+    New-Item "$scratch\$($m.Name)" -Force | Out-Null
+    Set-ItemProperty "$scratch\$($m.Name)" Version $m.Value.version
+}
+$run1 = & "$PSScriptRoot\windhawk.ps1" -Raiz $scratch *>&1 | Out-String
+$run2 = & "$PSScriptRoot\windhawk.ps1" -Raiz $scratch *>&1 | Out-String
+$wrong = @(); $total = 0
+foreach ($m in $mods.PSObject.Properties) {
+    $key = "$scratch\$($m.Name)"
+    if ("$(Get-RegValue $key 'Disabled')" -ne "$($m.Value.disabled)") { $wrong += "$($m.Name)\Disabled" }
+    foreach ($s in $m.Value.settings.PSObject.Properties) {
+        $total++
+        $k = Get-Item -LiteralPath "$key\Settings" -ErrorAction SilentlyContinue
+        if (-not $k -or "$($k.GetValue($s.Name))" -ne "$($s.Value.value)" -or "$($k.GetValueKind($s.Name))" -ne $s.Value.type) { $wrong += "$($m.Name)\$($s.Name)" }
+    }
+}
+Remove-Item "HKCU:\Software\PcConfigTests" -Recurse -ErrorAction SilentlyContinue
+Assert (($total -gt 0) -and ($wrong.Count -eq 0)) "windhawk.ps1 restores all $total settings with the right type ($($wrong.Count) wrong$(if ($wrong) { ': ' + ($wrong | Select-Object -First 3) -join ', ' }))"
+Assert ($run2 -notmatch '\+ ') 'windhawk.ps1 is idempotent (second run changes nothing)'
+
 if ($failed) { Write-Host "`n$failed falha(s)" -ForegroundColor Red; exit 1 }
 Write-Host "`nTudo ok" -ForegroundColor Green
 exit 0

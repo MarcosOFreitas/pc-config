@@ -7,10 +7,14 @@
         .\windhawk.ps1 -Exportar  save this machine's mods and settings to the repo
 #>
 [CmdletBinding(SupportsShouldProcess)]
-param([switch]$Exportar)
+param(
+    [switch]$Exportar,
+    # Registry root of the mods; only tests.ps1 changes it (scratch keys in HKCU, no admin needed).
+    [string]$Raiz = 'HKLM:\SOFTWARE\Windhawk\Engine\Mods'
+)
 $ErrorActionPreference = 'Stop'
 . "$PSScriptRoot\lib.ps1"
-$root = 'HKLM:\SOFTWARE\Windhawk\Engine\Mods'
+$root = $Raiz
 $file = "$PSScriptRoot\windhawk\mods.json"
 
 if (-not (Test-Path $root)) { Write-Host 'x Windhawk nao instalado ou sem mods. Rode .\install.ps1 e abra o Windhawk uma vez.' -ForegroundColor Red; exit 1 }
@@ -51,7 +55,8 @@ foreach ($mod in $mods.PSObject.Properties) {
     foreach ($s in $want.settings.PSObject.Properties) { $targets += @{ Path = "$key\Settings"; Name = $s.Name; Value = $s.Value.value; Type = $s.Value.type } }
     foreach ($t in $targets) {
         $cur = Get-RegValue $t.Path $t.Name
-        if ("$cur" -eq "$($t.Value)") { continue }
+        # An absent value is not an empty one: the mod would fall back to its own default.
+        if ($null -ne $cur -and "$cur" -eq "$($t.Value)") { continue }
         if ($PSCmdlet.ShouldProcess("$id\$($t.Name)", 'definir')) { Set-Reg $t.Path $t.Name $t.Value $t.Type; $changed = $true }
     }
     # The engine reloads a mod when this timestamp changes.
