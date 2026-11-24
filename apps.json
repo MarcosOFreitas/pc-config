@@ -51,6 +51,7 @@
   ],
   "Seguranca": [
     { "winget": "Bitwarden.Bitwarden", "choco": "bitwarden" },
+    { "winget": "Proton.ProtonVPN", "choco": "protonvpn" },
     { "winget": "LocalSend.LocalSend", "choco": "localsend" }
   ],
   "Comunicacao": [
