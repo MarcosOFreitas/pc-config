@@ -7,16 +7,7 @@
 # TODO: no undo script yet; the restore point is the only way back.
 $ErrorActionPreference = 'Continue'
 
-# Some values are locked by Windows (UCPD driver, tamper protection) even for admins.
-# A locked value only warns, so the rest of the script still runs.
-function Set-Reg($path, $name, $value, $type = 'DWord') {
-    try {
-        if (-not (Test-Path $path)) { New-Item -Path $path -Force -ErrorAction Stop | Out-Null }
-        Set-ItemProperty -Path $path -Name $name -Value $value -Type $type -ErrorAction Stop
-    } catch {
-        Write-Warning "$path\$name bloqueado pelo Windows, ignorado."
-    }
-}
+. "$PSScriptRoot\lib.ps1"   # Set-Reg
 
 Write-Host '==> Ponto de restauracao' -ForegroundColor Cyan
 Enable-ComputerRestore -Drive "$env:SystemDrive\"
