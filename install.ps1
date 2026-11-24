@@ -40,6 +40,10 @@ function Install-Choco {
     Update-SessionPath
 }
 
+# winget can be missing (Windows Sandbox, LTSC, old builds): then everything goes through choco.
+$hasWinget = [bool](Get-Command winget -ErrorAction SilentlyContinue)
+if (-not $hasWinget) { Write-Host '! winget ausente: usando so o choco (apps sem entrada choco vao falhar)' -ForegroundColor Yellow }
+
 function Install-App($app) {
     $name = if ($app.nome) { $app.nome } elseif ($app.uv) { $app.uv } elseif ($app.winget) { $app.winget } else { $app.choco }
 
@@ -51,7 +55,7 @@ function Install-App($app) {
         if ($app.uv -eq 'python') { uv python install --default --preview } else { uv tool install $app.uv }
         if ($LASTEXITCODE -eq 0) { Write-Host "  + $name (uv)" -ForegroundColor Green; return $true }
     }
-    if ($app.winget) {
+    if ($app.winget -and $hasWinget) {
         # Store IDs (9XXXXXXXXXXX) live in the msstore source.
         # TODO: msstore installs may fail without a Microsoft account signed in to the Store.
         $source = if ($app.winget -match '^9[A-Z0-9]{11}$') { 'msstore' } else { 'winget' }

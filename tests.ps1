@@ -25,6 +25,9 @@ foreach ($f in $scripts | Where-Object Name -ne 'tests.ps1') {
 # UCPD (Windows 11 24H2+) blocks any write to TaskbarDa with "unauthorized operation".
 Assert (-not (Select-String -Path "$PSScriptRoot\debloat.ps1" -Pattern 'TaskbarDa' -Quiet)) 'debloat.ps1 does not write TaskbarDa'
 
+# Without winget (Sandbox, LTSC) install.ps1 must fall back to choco instead of crashing.
+Assert (Select-String -Path "$PSScriptRoot\install.ps1" -Pattern 'Get-Command winget' -Quiet) 'install.ps1 checks that winget exists'
+
 # A protected registry value must not print a red error or stop debloat.
 . ([scriptblock]::Create(((Get-Content "$PSScriptRoot\debloat.ps1" -Raw) -split '(?m)^Write-Host ''==> Ponto')[0]))
 $warn = Set-Reg 'HKLM:\NoSuchHive\PcConfigTest' X 1 3>&1 2>&1
