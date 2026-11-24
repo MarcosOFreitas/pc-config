@@ -7,9 +7,15 @@
 # TODO: no undo script yet; the restore point is the only way back.
 $ErrorActionPreference = 'Continue'
 
+# Some values are locked by Windows (UCPD driver, tamper protection) even for admins.
+# A locked value only warns, so the rest of the script still runs.
 function Set-Reg($path, $name, $value, $type = 'DWord') {
-    if (-not (Test-Path $path)) { New-Item -Path $path -Force | Out-Null }
-    Set-ItemProperty -Path $path -Name $name -Value $value -Type $type
+    try {
+        if (-not (Test-Path $path)) { New-Item -Path $path -Force -ErrorAction Stop | Out-Null }
+        Set-ItemProperty -Path $path -Name $name -Value $value -Type $type -ErrorAction Stop
+    } catch {
+        Write-Warning "$path\$name bloqueado pelo Windows, ignorado."
+    }
 }
 
 Write-Host '==> Ponto de restauracao' -ForegroundColor Cyan
@@ -38,6 +44,7 @@ $bloat = @(
     'MicrosoftTeams'
     'MSTeams'
     'Microsoft.549981C3F5F10'   # Cortana
+    'MicrosoftWindows.Client.WebExperience'   # Widgets (registry toggle is locked by UCPD)
 )
 foreach ($app in $bloat) {
     Get-AppxPackage -AllUsers -Name $app | Remove-AppxPackage -AllUsers -ErrorAction SilentlyContinue
@@ -71,7 +78,6 @@ $adv = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced'
 Set-Reg $adv HideFileExt 0
 Set-Reg $adv Hidden 1
 Set-Reg $adv LaunchTo 1              # open "This PC"
-Set-Reg $adv TaskbarDa 0             # hide widgets button
 Set-Reg 'HKCU:\Software\Classes\CLSID\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}\InprocServer32' '(default)' '' 'String'  # classic context menu
 
 Write-Host '==> Performance' -ForegroundColor Cyan

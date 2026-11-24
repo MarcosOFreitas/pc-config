@@ -9,6 +9,8 @@ Tirar apps e serviços que o Windows instala por padrão e ajustar desempenho.
 - Desliga telemetria (`AllowTelemetry=0`, serviços `DiagTrack` e `dmwappushservice`), ID de anúncio, sugestões, Bing no menu Iniciar, widgets.
 - Explorer: mostra extensões e ocultos, abre em "Este PC", menu de contexto clássico.
 - Desempenho: plano Ultimate (ou Alto desempenho), Game DVR off, apps em segundo plano off, agendamento de GPU por hardware, `SystemResponsiveness=10`.
+- Widgets: remove o pacote `MicrosoftWindows.Client.WebExperience`. O `TaskbarDa` não é usado: o driver UCPD (Windows 11 24H2+) bloqueia qualquer escrita nele.
+- Valor de registro bloqueado pelo Windows vira aviso (`Write-Warning`) e o script segue.
 - Reinicia o Explorer no fim; o usuário reinicia o PC.
 
 ## Fora do escopo
