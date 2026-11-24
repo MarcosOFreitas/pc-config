@@ -11,7 +11,7 @@ irm https://raw.githubusercontent.com/MarcosOFreitas/pc-config/main/bootstrap.ps
 - Roda no Windows PowerShell 5.1, como administrador (senão avisa e para).
 - Baixa o zip da `main` para `~\pc-config` e desbloqueia os arquivos. Pasta durável: o `$PROFILE` aponta para ela.
 - Se `~\pc-config` já é clone git, usa como está.
-- Ordem: `debloat` > `shell` > `install` > `wsl` > `vscode` > `git`. Falha num passo não para os outros; no fim lista o que falhou.
+- Ordem: `debloat` > `windows` > `shell` > `install` > `windhawk` > `wsl` > `vscode` > `git`. Falha num passo não para os outros; no fim lista o que falhou.
 - `-Passos` escolhe e `-Pular` remove passos; a ordem é sempre a fixa acima. Nome inválido falha na validação; seleção vazia avisa e para.
 - `-Destino` muda a pasta do repo (PC já configurado: aponte para o clone existente, evita segunda cópia e não muda o `$PROFILE`).
 - Parâmetros via `& ([scriptblock]::Create((irm <url>))) -Pular debloat`; `irm | iex` usa os padrões.

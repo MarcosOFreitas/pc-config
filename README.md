@@ -26,7 +26,7 @@ Baixa o repo para `~\pc-config`, roda todos os scripts na ordem e deixa a pasta 
 
 | Parâmetro | Valores | Padrão |
 |---|---|---|
-| `-Passos` | `debloat`, `shell`, `install`, `wsl`, `vscode`, `git` (ordem fixa) | todos |
+| `-Passos` | `debloat`, `windows`, `shell`, `install`, `windhawk`, `wsl`, `vscode`, `git` (ordem fixa) | todos |
 | `-Pular` | mesmos valores | nenhum |
 | `-Destino` | pasta do repo | `~\pc-config` |
 
@@ -39,8 +39,10 @@ Abra o PowerShell **como administrador** na pasta do repo:
 ```powershell
 Set-ExecutionPolicy Bypass -Scope Process -Force
 .\debloat.ps1   # remove bloat, telemetria, ajustes de desempenho (reinicie depois)
+.\windows.ps1   # preferências: modo escuro, barra de tarefas, Iniciar, região, arquivos, energia
 .\shell.ps1     # PowerShell 7, ferramentas de terminal, perfil, fonte, Windows Terminal
 .\install.ps1   # demais apps de apps.json
+.\windhawk.ps1  # restaura as configurações dos mods do Windhawk (instale os mods antes)
 .\wsl.ps1       # WSL + Ubuntu + .wslconfig
 .\vscode.ps1    # extensões e configs do VS Code
 .\git.ps1       # git config, chave SSH, login no GitHub
@@ -52,6 +54,10 @@ Cada script roda sozinho e pode ser repetido: o que já está instalado é pulad
 |---|---|---|
 | `bootstrap.ps1` | Baixa o repo e roda todos os scripts abaixo | — |
 | `install.ps1` | Instala os apps de `apps.json`: `uv` > `winget` > `choco` (fallback) | `-Categoria Dev,Terminal`, `-Exportar` (lista apps instalados fora do `apps.json`) |
+| `windows.ps1` | Preferências do Windows: tema escuro; barra centralizada, oculta automaticamente, sem busca nem Visão de Tarefas; Iniciar sem recomendados; fuso de Brasília, hora automática, pt-BR ABNT2; caminhos longos, modo desenvolvedor, Storage Sense; sem suspender na tomada | — |
+| `windhawk.ps1` | Restaura configurações de `windhawk/mods.json` nos mods já instalados e lista os que faltam instalar (o Windhawk não tem comando de instalação) | `-Exportar` (salva as da máquina), `-WhatIf` |
+| `sandbox.ps1` | Testa o bootstrap num Windows Sandbox limpo, sem intervenção, e mostra o log | `-Passos`, `-TimeoutMin` |
+| `tests.ps1` | Checagens estáticas dos scripts (rode antes de commitar) | — |
 | `git.ps1` | Nome/email (perguntados na hora), config global, chave SSH ed25519, `gh auth login` e envio da chave pública | — |
 | `wsl.ps1` | WSL + Ubuntu, `.wslconfig` com metade da RAM e das CPUs | `-Distro` |
 | `shell.ps1` | Categoria `Terminal` + `$PROFILE` apontando para `profile.ps1` + Meslo Nerd Font + Windows Terminal padrão | `-SoPerfil` |

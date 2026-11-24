@@ -13,7 +13,8 @@ Windows 11 machine setup in PowerShell. See README.md for usage and `.specs/` fo
 - Mark known gaps with `# TODO:` comments; keep `.specs/` in sync when behavior changes.
 
 - Admin check: `IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)`, never the group name (it is localized: `Administradores` on pt-BR).
-- Registry writes in `debloat.ps1` go through `Set-Reg`, which warns instead of failing on values Windows locks (UCPD).
+- Registry access goes through `lib.ps1`: `Set-Reg` warns instead of failing on values Windows locks (UCPD); `Get-RegValue` reads negative DWords correctly (`Get-ItemProperty` does not). Dot-source it, never copy the functions.
+- Do not write `TaskbarDa` (UCPD blocks it). `windhawk\mods.json` is public: review its diff before committing.
 
 ## Check before commit
 ```powershell

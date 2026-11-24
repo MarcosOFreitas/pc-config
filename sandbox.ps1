@@ -5,13 +5,13 @@
   Maps the repo read-only, copies it inside, runs bootstrap.ps1 and writes a log to
   a host folder; this script waits for the end and prints the log tail.
 .EXAMPLE
-  .\sandbox.ps1                       # debloat, shell, install, vscode
+  .\sandbox.ps1                       # debloat, windows, shell, install, vscode
   .\sandbox.ps1 -Passos install       # one step only
 #>
 param(
     # wsl needs nested virtualization and git.ps1 asks for input: neither works in the Sandbox.
-    [ValidateSet('debloat', 'shell', 'install', 'vscode')]
-    [string[]]$Passos = @('debloat', 'shell', 'install', 'vscode'),
+    [ValidateSet('debloat', 'windows', 'shell', 'install', 'vscode')]
+    [string[]]$Passos = @('debloat', 'windows', 'shell', 'install', 'vscode'),
     [int]$TimeoutMin = 90,
     [int]$Tail = 150
 )

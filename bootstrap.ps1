@@ -17,9 +17,9 @@
   Repo folder. Use the existing clone on an already configured PC to avoid a second copy.
 #>
 param(
-    [ValidateSet('debloat', 'shell', 'install', 'wsl', 'vscode', 'git')]
-    [string[]]$Passos = @('debloat', 'shell', 'install', 'wsl', 'vscode', 'git'),
-    [ValidateSet('debloat', 'shell', 'install', 'wsl', 'vscode', 'git')]
+    [ValidateSet('debloat', 'windows', 'shell', 'install', 'windhawk', 'wsl', 'vscode', 'git')]
+    [string[]]$Passos = @('debloat', 'windows', 'shell', 'install', 'windhawk', 'wsl', 'vscode', 'git'),
+    [ValidateSet('debloat', 'windows', 'shell', 'install', 'windhawk', 'wsl', 'vscode', 'git')]
     [string[]]$Pular = @(),
     [string]$Destino = "$HOME\pc-config"   # durable: $PROFILE dot-sources profile.ps1 from here
 )
@@ -27,7 +27,7 @@ $ErrorActionPreference = 'Stop'
 $repo = 'MarcosOFreitas/pc-config'
 $dest = $Destino
 # Fixed order; -Passos only filters it.
-$steps = 'debloat', 'shell', 'install', 'wsl', 'vscode', 'git' | Where-Object { $_ -in $Passos -and $_ -notin $Pular }
+$steps = 'debloat', 'windows', 'shell', 'install', 'windhawk', 'wsl', 'vscode', 'git' | Where-Object { $_ -in $Passos -and $_ -notin $Pular }
 if (-not $steps) { Write-Host 'x Nenhum passo selecionado.' -ForegroundColor Red; return }
 Write-Host "Passos: $($steps -join ' > ')" -ForegroundColor Cyan
 
