@@ -51,6 +51,7 @@
   ],
   "Seguranca": [
     { "winget": "Bitwarden.Bitwarden", "choco": "bitwarden" },
+    { "winget": "WireGuard.WireGuard", "choco": "wireguard" },
     { "winget": "LocalSend.LocalSend", "choco": "localsend" }
   ],
   "Comunicacao": [
